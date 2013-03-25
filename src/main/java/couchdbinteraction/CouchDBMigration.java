@@ -52,7 +52,8 @@ public class CouchDBMigration {
 		}
 	}
 	
-	public static void importDB(String filePath,String dbName,boolean deleteOldDb) throws JsonProcessingException, IOException
+	public static void importDB(String filePath,String dbName,boolean deleteOldDb) 
+			throws JsonProcessingException, IOException
 	{
 		HttpClient httpClient = new StdHttpClient.Builder().build();
 		CouchDbInstance dbInstance = new StdCouchDbInstance(httpClient);
@@ -79,11 +80,12 @@ public class CouchDBMigration {
 		is.close();
 	}
 	
-	public static void main(String args[])
+	public static void main(String args[]) throws JsonProcessingException, IOException
 	{
 		//sorry for the poor state of the code; for now you can use this method to try out those two methods above; 
 		//I plan to add a command line interface some time when I can think straighter
-		exportDB("/home/atroie/movies.json","movies");
+		//exportDB("/home/atroie/movies.json","movies");
+		importDB("C:\\Users\\Elston\\Documents\\CS\\4\\Information Retrieval\\Group\\movies.json","IRFILM", false);
 	}
 
 }
