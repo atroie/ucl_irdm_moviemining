@@ -1,6 +1,5 @@
 package text;
 
-import java.util.regex.Pattern;
 
 public class TextNormalizer {
 	public static String normalize(String s)

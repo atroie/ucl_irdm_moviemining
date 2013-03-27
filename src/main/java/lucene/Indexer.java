@@ -2,7 +2,6 @@ package lucene;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -16,16 +15,14 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
 
-import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
-import org.codehaus.jackson.JsonToken;
-
 import org.ektorp.CouchDbConnector;
-import org.ektorp.CouchDbInstance;
-import org.ektorp.http.HttpClient;
-import org.ektorp.http.StdHttpClient;
-import org.ektorp.impl.StdCouchDbInstance;
+
+
+import couchdbinteraction.CouchDBFactory;
+import couchdbinteraction.CouchDBParameterSchema;
 
 public class Indexer {
 
@@ -59,44 +56,49 @@ public class Indexer {
 
 	public void indexFilm(JsonParser filmParser) throws JsonParseException, IOException {
 		Document doc = new Document();
-		
+
 		while (filmParser.nextToken() != null) {			 
 			String fieldname = filmParser.getCurrentName();
-			
-			if ("_id".equals(fieldname)) {
+
+			if (CouchDBParameterSchema.PARAM_ID.equals(fieldname)) {
 				filmParser.nextToken();
 				String id = filmParser.getText();
-				doc.add(new Field("id", id, TextField.TYPE_STORED));
+				doc.add(new Field(LuceneParameterSchema.PARAM_ID, id, TextField.TYPE_STORED));
 			}
-			if ("title".equals(fieldname)) {
+			if (CouchDBParameterSchema.PARAM_TITLE.equals(fieldname)) {
 				filmParser.nextToken();
 				String title = filmParser.getText();
-				doc.add(new Field("title", title, TextField.TYPE_STORED));
+				doc.add(new Field(LuceneParameterSchema.PARAM_TITLE, title, TextField.TYPE_STORED));
 			}
-			if ("synopsis".equals(fieldname)) {
+			if (CouchDBParameterSchema.PARAM_SYNOPSIS.equals(fieldname)) {
 				filmParser.nextToken();
 				String synopsis = filmParser.getText();
-				doc.add(new Field("synopsis", synopsis, TextField.TYPE_STORED));
+				doc.add(new Field(LuceneParameterSchema.PARAM_SYNOPSIS, synopsis, TextField.TYPE_STORED));
 			}
 
 		}
 		indexWriter.addDocument(doc);
 	}
 
+	public void indexFilm(JsonNode film) throws JsonParseException, IOException {
+		Document doc = new Document();		
+		doc.add(new Field(LuceneParameterSchema.PARAM_ID, film.get(CouchDBParameterSchema.PARAM_ID).getTextValue(), TextField.TYPE_STORED));
+		doc.add(new Field(LuceneParameterSchema.PARAM_TITLE, film.get(CouchDBParameterSchema.PARAM_TITLE).getTextValue(), TextField.TYPE_STORED));
+		doc.add(new Field(LuceneParameterSchema.PARAM_SYNOPSIS,film.get(CouchDBParameterSchema.PARAM_SYNOPSIS).getTextValue(),TextField.TYPE_STORED));
+		indexWriter.addDocument(doc);
+	}
+
 	public void buildIndices(String dbName) throws IOException {
 		// CouchDB Set up
-		HttpClient httpClient = new StdHttpClient.Builder().build();
-		CouchDbInstance dbInstance = new StdCouchDbInstance(httpClient);
-		CouchDbConnector db = dbInstance.createConnector(dbName, true);
-		JsonFactory jfactory = new JsonFactory();
+
+		CouchDbConnector db = CouchDBFactory.getConnection(dbName);
 
 		getIndexWriter();
 
 		List<String> filmIDs = db.getAllDocIds();
 		for (String filmID : filmIDs) {
-			InputStream filmStream = db.getAsStream(filmID);
-			JsonParser jParser = jfactory.createJsonParser(filmStream);
-			indexFilm(jParser);
+			JsonNode film = db.get(JsonNode.class, filmID);
+					indexFilm(film);
 		}
 
 		closeIndexWriter();

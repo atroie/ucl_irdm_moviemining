@@ -19,7 +19,7 @@ public class CouchDBUploader {
 	 * @param movies a list of JsonNodes, as returned by, e.g. MovieDownloader
 	 * @param dbName name of the database to upload to
 	 */
-	public void upload(List<JsonNode> movies,String dbName)
+	public void uploadMoviesToDb(List<JsonNode> movies,String dbName)
 	{
 		HttpClient httpClient = new StdHttpClient.Builder().build();
 		CouchDbInstance dbInstance = new StdCouchDbInstance(httpClient);

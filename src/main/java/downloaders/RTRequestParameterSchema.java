@@ -1,5 +1,7 @@
 package downloaders;
 
+import parameterschema.ParameterSchema;
+
 public interface RTRequestParameterSchema extends ParameterSchema {
 	public final String PARAM_LIMIT = "limit";
 	public final String PARAM_PAGE_LIMIT = "page_limit";

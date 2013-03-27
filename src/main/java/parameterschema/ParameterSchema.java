@@ -1,4 +1,4 @@
-package downloaders;
+package parameterschema;
 
 public interface ParameterSchema {
 

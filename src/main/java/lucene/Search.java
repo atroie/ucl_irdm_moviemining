@@ -37,7 +37,7 @@ public class Search {
 		// Iterate through the results:
 		for (int i = 0; i < hits.length; i++) {
 			Document hitDoc = isearcher.doc(hits[i].doc);
-			System.out.println(hitDoc.get("synopsis"));
+			System.out.println(hitDoc.get(LuceneParameterSchema.PARAM_SYNOPSIS));
 		}
 		ireader.close();
 	}

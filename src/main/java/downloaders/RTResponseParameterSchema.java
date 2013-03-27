@@ -1,5 +1,7 @@
 package downloaders;
 
+import parameterschema.ParameterSchema;
+
 public interface RTResponseParameterSchema extends ParameterSchema {
 	public static final String PARAM_LINKS = "links";
 	public static final String PARAM_MOVIES = "movies";
