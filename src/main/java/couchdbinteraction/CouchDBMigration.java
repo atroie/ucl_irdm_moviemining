@@ -17,6 +17,11 @@ import org.codehaus.jackson.node.ObjectNode;
 import org.ektorp.CouchDbConnector;
 import org.ektorp.UpdateConflictException;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+
 
 public class CouchDBMigration {
 	/**
@@ -26,7 +31,7 @@ public class CouchDBMigration {
 	 */
 	public static void exportDB(String dbName,String filePath)
 	{
-		
+
 		try {
 			File f = new File(filePath);
 			OutputStream os = new FileOutputStream(f);
@@ -36,7 +41,7 @@ public class CouchDBMigration {
 				os.close();
 				throw new IllegalArgumentException("Database does not exist");
 			}
-				
+
 
 			ArrayNode allMovies = JsonNodeFactory.instance.arrayNode();
 			for(String itemId : db.getAllDocIds())
@@ -48,7 +53,7 @@ public class CouchDBMigration {
 			}
 			os.write(allMovies.toString().getBytes());
 			os.close();
-			
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -56,8 +61,56 @@ public class CouchDBMigration {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
+	/**
+	 * Exports a representation of the given database to an excel file
+	 * @param dbName The name of the database to export
+	 * @param filePath The file to export to
+	 */
+	public static void exportDBToExcel(String dbName, String filePath) {
+		SXSSFWorkbook wb = new SXSSFWorkbook(1); // number of rows to keep in memory; I'm only writing one row at a time so 1 is enough
+		String[] fields = new String[] { CouchDBParameterSchema.PARAM_TITLE,CouchDBParameterSchema.PARAM_SYNOPSIS,CouchDBParameterSchema.PARAM_ID };
+		CouchDbConnector db = CouchDBFactory.getConnection(dbName);
+		Sheet sh = wb.createSheet();
+		int i = 0;
+		Row header = sh.createRow(0);
+		for(; i < fields.length; i++)
+		{
+			Cell headerCell = header.createCell(i);
+			headerCell.setCellValue(fields[i]);
+		}
+		int rownum = 1;
+		for(String id : db.getAllDocIds())
+		{
+			JsonNode movie = db.get(JsonNode.class, id);
+			Row row = sh.createRow(rownum++);
+			for(i = 0;i < fields.length;i++)
+			{
+				Cell cell = row.createCell(i);
+				cell.setCellValue(movie.get(fields[i]).getTextValue());
+			}
+			
+		}
+		
+		try 
+		{
+			OutputStream out = new FileOutputStream(filePath); 
+			wb.write(out);
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally
+		{
+			// dispose of temporary files backing this workbook on disk
+			wb.dispose();
+
+		}
+
+
+	}
+
 	/**
 	 * Import a list of movies into the given database from the given filepath
 	 * @param dbName The database to import to
@@ -68,7 +121,7 @@ public class CouchDBMigration {
 	 */
 	public static void importDB(String dbName,String filePath,boolean clearDb) 
 			throws JsonProcessingException, IOException
-	{
+			{
 		if(clearDb)
 		{
 			CouchDBFactory.clearDatabase(dbName);
@@ -82,7 +135,7 @@ public class CouchDBMigration {
 		{
 			try
 			{
-			db.create(movie);
+				db.create(movie);
 			}
 			catch(UpdateConflictException uce)
 			{
@@ -90,17 +143,17 @@ public class CouchDBMigration {
 			}
 		}
 		is.close();
-	}
-	
+			}
+
 	public static void usage()
 	{
 		System.err.println("usage: <command> <dbname> <filename> [deleteonimport]");
-		System.err.println("command: one of 'import' or 'export'");
+		System.err.println("command: one of 'import', 'export' or 'excel-export'");
 		System.err.println("dbname: name of database that you are importing from/exporting to");
 		System.err.println("filename: name of file to import from/export to");
 		System.err.println("deleteonimport: (optional) one of 'true' or 'false'. If 'true', wipe database clean before import");
 	}
-	
+
 	public static void main(String args[]) throws JsonProcessingException, IOException
 	{
 		if(args.length < 3)
@@ -119,11 +172,17 @@ public class CouchDBMigration {
 			System.out.printf("Importing movies from file %s to database '%s'\n",args[1],args[2]);
 			importDB(args[1],args[2],clearDb);
 		}
+		else if(args[0].equals("excel-export"))
+		{
+			System.out.printf("Exporting database '%s' to file %s\n",args[1],args[2]);
+			exportDBToExcel(args[1],args[2]);
+		}
 		else
 		{
 			System.err.println("Unrecognised command");
 			System.exit(-2);
 		}
 	}
+
 
 }
