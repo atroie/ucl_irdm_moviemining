@@ -19,7 +19,7 @@ public class CouchDBUploader {
 	 * @param movies a list of JsonNodes, as returned by, e.g. MovieDownloader
 	 * @param dbName name of the database to upload to
 	 */
-	public void uploadMoviesToDb(List<JsonNode> movies,String dbName)
+	public void uploadMoviesToDb(List<JsonNode> movies,String dbName,String titleParamName)
 	{
 		HttpClient httpClient = new StdHttpClient.Builder().build();
 		CouchDbInstance dbInstance = new StdCouchDbInstance(httpClient);
@@ -27,11 +27,11 @@ public class CouchDBUploader {
 		int successfullyInserted = 0;
 		for(JsonNode movie : movies)
 		{
-			String movieId = KeyUtil.getKeyForTitle(movie.get(RTResponseParameterSchema.PARAM_TITLE).getTextValue());
+			String movieId = KeyUtil.getKeyForTitle(movie.get(titleParamName).getTextValue());
 			try
 			{
 			db.create(movieId,movie);
-			System.out.printf("Inserted %s\n",movie.get(RTResponseParameterSchema.PARAM_TITLE).getTextValue());
+			System.out.printf("Inserted %s\n",movie.get(titleParamName).getTextValue());
 			successfullyInserted++;
 			}
 			catch(UpdateConflictException uce)

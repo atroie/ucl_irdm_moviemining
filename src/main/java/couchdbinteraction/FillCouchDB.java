@@ -1,11 +1,10 @@
 package couchdbinteraction;
 
 
-import java.util.List;
-
-import org.codehaus.jackson.JsonNode;
-
-import download.MovieDownloader;
+import download.OMDBMovieListDownloader;
+import download.RottenTomatoesMovieListDownloader;
+import downloaders.OMDBResponseParameterSchema;
+import downloaders.RTResponseParameterSchema;
 
 public class FillCouchDB {
 
@@ -15,22 +14,29 @@ public class FillCouchDB {
 	
 	public static void usage()
 	{
-		System.err.println("Usage: <dbname>");
+		System.err.println("Usage: <source> <dbname>");
+		System.err.println("Where <srouce> is one of 'omdb', 'rt'");
 		System.err.println("Where <dbname> is the name of the database you want to upload to");
 	}
 	public static void main(String[] args) {
-		if(args.length != 1)
+		if(args.length != 2)
 		{
 			usage();
 			System.exit(-1);
 		}
-		System.out.println("Downloading movies...");
-		MovieDownloader md = new MovieDownloader();
-		List<JsonNode> movies = md.downloadMovies();
-		System.out.printf("%d movies downloaded, inserting in database '%s'\n...",movies.size(),args[0]);
 		CouchDBUploader up = new CouchDBUploader();
-		up.uploadMoviesToDb(movies, args[0]);
-	}
+		if(args[0].equals("omdb"))
+		{
+			OMDBMovieListDownloader omld = new OMDBMovieListDownloader();
+			up.uploadMoviesToDb(omld.downloadMovies(), args[1], OMDBResponseParameterSchema.PARAM_TITLE);
+		}
+		else if(args[0].equals("rt"))
+		{
+			RottenTomatoesMovieListDownloader rtmld = new RottenTomatoesMovieListDownloader();
+			up.uploadMoviesToDb(rtmld.downloadMovies(), args[1], RTResponseParameterSchema.PARAM_TITLE);
+		}
+		
+	} 
 }
 
 

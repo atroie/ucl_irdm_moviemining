@@ -15,7 +15,7 @@ import downloaders.TopLevelRTListDownloader;
 
 
 
-public class MovieDownloader {
+public class RottenTomatoesMovieListDownloader {
 
 
 	public List<JsonNode> downloadMovies() {

@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.JsonNode;
@@ -24,12 +23,7 @@ public abstract class Downloader {
 		uriBuilder.setPath(this.path);
 	}
 	protected abstract void prepareParams();
-	protected HttpResponse executeRequest() throws URISyntaxException, ClientProtocolException, IOException
-	{
-		prepareParams();
-		HttpGet get = new HttpGet(uriBuilder.build());
-		return httpClient.execute(get);
-	}
+	protected abstract HttpResponse executeRequest() throws URISyntaxException, ClientProtocolException, IOException; 
 	public abstract JsonNode download();
 
 }
