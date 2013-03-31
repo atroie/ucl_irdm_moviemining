@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.queryparser.classic.ParseException;
@@ -13,7 +14,6 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.util.Version;
 
 public class Search {
@@ -32,6 +32,7 @@ public class Search {
 	public void run(String fieldName, String q) throws ParseException, IOException {
 		parser = new QueryParser(Version.LUCENE_42, fieldName, analyzer);
 		Query query = parser.parse(q);
+		setCustomSimilarity();
 		ScoreDoc[] hits = isearcher.search(query, null, 1000).scoreDocs;
 
 		// Iterate through the results:
@@ -40,6 +41,10 @@ public class Search {
 			System.out.println(hitDoc.get(LuceneParameterSchema.PARAM_SYNOPSIS));
 		}
 		ireader.close();
+	}
+	
+	private void setCustomSimilarity() {
+		isearcher.setSimilarity(new CustomSimilarity());
 	}
 
 }
