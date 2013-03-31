@@ -3,6 +3,8 @@ package lucene;
 import java.io.File;
 import java.io.IOException;
 
+import lucene.similarities.TFIDFCustom;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -29,7 +31,8 @@ public class Search {
 		isearcher = new IndexSearcher(ireader);
 	}
 
-	public void run(String fieldName, String q) throws ParseException, IOException {
+	public void run(String fieldName, String q) throws ParseException,
+			IOException {
 		parser = new QueryParser(Version.LUCENE_42, fieldName, analyzer);
 		Query query = parser.parse(q);
 		setCustomSimilarity();
@@ -38,13 +41,18 @@ public class Search {
 		// Iterate through the results:
 		for (int i = 0; i < hits.length; i++) {
 			Document hitDoc = isearcher.doc(hits[i].doc);
-			System.out.println(hitDoc.get(LuceneParameterSchema.PARAM_SYNOPSIS));
+			System.out
+					.println(hitDoc.get(LuceneParameterSchema.PARAM_SYNOPSIS));
 		}
 		ireader.close();
 	}
-	
+
+	/**
+	 * Method changes the Similarity used. Currently points to the TFIDF toy
+	 * class.
+	 */
 	private void setCustomSimilarity() {
-		isearcher.setSimilarity(new CustomSimilarity());
+		isearcher.setSimilarity(new TFIDFCustom());
 	}
 
 }

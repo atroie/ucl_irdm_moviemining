@@ -1,11 +1,14 @@
-package lucene;
+package lucene.similarities;
 
 import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
 import org.apache.lucene.util.BytesRef;
 
+public class TFIDFCustom extends TFIDFSimilarity {
 
-public class CustomSimilarity extends TFIDFSimilarity {
+	public TFIDFCustom() {
+		
+	}
 
 	@Override
 	public float coord(int overlap, int maxOverlap) {
@@ -19,13 +22,12 @@ public class CustomSimilarity extends TFIDFSimilarity {
 
 	@Override
 	public float tf(float freq) {
-//		return (float) Math.sqrt(freq);
-		return 1.0f;
+		return (float) Math.sqrt(freq);
 	}
 
 	@Override
 	public float idf(long docFreq, long numDocs) {
-		return (float) (Math.log(numDocs/(double)(docFreq+1)) + 1.0);
+		return (float) (Math.log(numDocs / (double) docFreq));
 	}
 
 	@Override
@@ -44,5 +46,4 @@ public class CustomSimilarity extends TFIDFSimilarity {
 		return 1;
 	}
 
-	
 }
