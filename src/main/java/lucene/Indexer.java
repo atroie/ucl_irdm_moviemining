@@ -20,7 +20,6 @@ import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.JsonParser;
 import org.ektorp.CouchDbConnector;
 
-
 import couchdbinteraction.CouchDBFactory;
 import couchdbinteraction.CouchDBParameterSchema;
 
