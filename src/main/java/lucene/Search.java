@@ -3,7 +3,8 @@ package lucene;
 import java.io.File;
 import java.io.IOException;
 
-import lucene.similarities.TFIDFCustom;
+import lucene.similarities.TFIDFCustomSimilarity;
+import lucene.similarities.VSMCustomSimilarity;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -45,7 +46,7 @@ public class Search {
 		for (int i = 0; i < hits.length; i++) {
 			Document hitDoc = isearcher.doc(hits[i].doc);
 			System.out
-					.println(hitDoc.get(LuceneParameterSchema.PARAM_SYNOPSIS));
+					.println(hitDoc.get(LuceneParameterSchema.PARAM_TITLE));
 		}
 		ireader.close();
 	}
@@ -57,9 +58,9 @@ public class Search {
 	private void setCustomSimilarity(String[] args) {
 		String model = args[0];
 		if (model.equalsIgnoreCase(LuceneParameterSchema.PARAM_TF_IDF)) {
-			// isearcher.setSimilarity(new TFIDFCustomSimilarity());
+			 isearcher.setSimilarity(new TFIDFCustomSimilarity());
 		} else if (model.equalsIgnoreCase(LuceneParameterSchema.PARAM_VSM)) {
-			// isearcher.setSimilarity(new VSMCustomSimilarity());
+			 isearcher.setSimilarity(new VSMCustomSimilarity());
 		} else if (model.equalsIgnoreCase(LuceneParameterSchema.PARAM_BM25)) {
 			isearcher.setSimilarity(new BM25Similarity(Float.valueOf(args[1]),
 					Float.valueOf(args[2])));

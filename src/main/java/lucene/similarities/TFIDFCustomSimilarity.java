@@ -4,36 +4,35 @@ import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
 import org.apache.lucene.util.BytesRef;
 
-public class TFIDFCustom extends TFIDFSimilarity {
+public class TFIDFCustomSimilarity extends TFIDFSimilarity {
 
-	public TFIDFCustom() {
+	public TFIDFCustomSimilarity() {
 		
 	}
 
 	@Override
 	public float coord(int overlap, int maxOverlap) {
-		return overlap / (float) maxOverlap;
+		return 1;
 	}
 
 	@Override
 	public float queryNorm(float sumOfSquaredWeights) {
-		return (float) (1.0 / Math.sqrt(sumOfSquaredWeights));
+		return 1;
 	}
 
 	@Override
 	public float tf(float freq) {
-		return (float) Math.sqrt(freq);
+		return freq;
 	}
 
 	@Override
 	public float idf(long docFreq, long numDocs) {
-		return (float) (Math.log(numDocs / (double) docFreq));
+		return (float) Math.sqrt((Math.log(numDocs / (double) docFreq)));
 	}
 
 	@Override
 	public float lengthNorm(FieldInvertState state) {
-		final int numTerms = state.getLength();
-		return state.getBoost() * ((float) (1.0 / Math.sqrt(numTerms)));
+		return 1;
 	}
 
 	@Override
