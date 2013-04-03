@@ -169,7 +169,7 @@ public class CouchDBMigration {
 		else if(args[0].equals("import"))
 		{
 			boolean clearDb = (args.length > 3 && Boolean.parseBoolean(args[3]) == true);
-			System.out.printf("Importing movies from file %s to database '%s'\n",args[1],args[2]);
+			System.out.printf("Importing movies from file %s to database '%s'\n",args[2],args[1]);
 			importDB(args[1],args[2],clearDb);
 		}
 		else if(args[0].equals("excel-export"))

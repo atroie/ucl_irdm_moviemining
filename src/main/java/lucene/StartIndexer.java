@@ -30,9 +30,8 @@ public class StartIndexer {
 			for(File child : indexDir.listFiles())
 			{
 				if(child.getName().equals("..") || child.getName().equals("."))
-				{
-					child.delete();
-				}
+					continue;
+				child.delete();
 			}
 		}
 		System.out.printf("Indexing database '%s' into directory %s\n",args[0],args[1]);
