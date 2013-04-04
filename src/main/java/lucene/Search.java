@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import lucene.similarities.CustomSimilarities;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
