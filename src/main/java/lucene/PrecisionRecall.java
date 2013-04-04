@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.util.Arrays;
+
+import lucene.similarities.CustomSimilarities;
+
 
 import org.apache.lucene.benchmark.quality.Judge;
 import org.apache.lucene.benchmark.quality.QualityBenchmark;
@@ -23,28 +27,30 @@ public class PrecisionRecall {
 
 	private static void usage()
 	{
-		System.err.println("Usage: <topics-path> <qrels-path> <index-dir>");
+		System.err.println("Usage: <topics-path> <qrels-path> <index-dir> <search-method> [<method-param> [<method-param>]]");
 		System.err.println("Where <index-dir> is the directory where the index lives");
 		System.err.println("Where <topics-dir> is the file path of topics.txt");
 		System.err.println("Where <qrels-dir> is the file path of qrels.txt");
+		System.err.println("Where <search-method> is one of 'tf-idf', 'vsm', 'bm25', 'jelinek', and 'dirich'");
 	}
 	
 	public static void main(String[] args) throws Throwable {
-		if(args.length != 3)
-		{
+		if (!(args.length > 3 && args.length < 7)) {
 			usage();
 			System.exit(-1);
 		}
 		
-		precisionRecall(args[0],args[1],args[2]);
+		precisionRecall(args[0],args[1],args[2],Arrays.copyOfRange(args, 3, args.length));
 	}
 	
-	private static void precisionRecall(String topicsPath, String qrelsPath, String indexDir) throws Exception {
+	private static void precisionRecall(String topicsPath, String qrelsPath, String indexDir, String[] models) throws Exception {
 		File topicsFile = new File(topicsPath);
 		File qrelsFile = new File(qrelsPath);
 		Directory dir = FSDirectory.open(new File(indexDir));
 		DirectoryReader ireader = DirectoryReader.open(dir);
 		IndexSearcher searcher = new IndexSearcher(ireader);
+		
+		CustomSimilarities.setCustomSimilarity(searcher, models);
 
 		String docNameField = LuceneParameterSchema.PARAM_ID;
 
